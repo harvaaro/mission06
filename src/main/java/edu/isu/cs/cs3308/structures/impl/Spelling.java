@@ -24,16 +24,7 @@ public class Spelling implements SpellChecker {
 	private char[] changes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'".toCharArray();
 
 	public Spelling() {
-		try {
-			FileReader file = new FileReader("data/en-US.dic");
-			BufferedReader buffer = new BufferedReader(file);
-			for (String line; (line = buffer.readLine()) != null; ) {
-				lexicon.add(line);
-			}
-			buffer.close();
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
+		saveLexcion(false);
 	}
 
 	/**
@@ -52,10 +43,35 @@ public class Spelling implements SpellChecker {
 		if (lexicon.contains(s)) return suggestList;
 
 		processWord(s);
+		if (suggestList.size() == 1) {
+			suggestList = new ArrayList<>();
+			saveLexcion(true);
+			processWord(s);
+		}
 		removeDuplicates();
 
 		if (suggestList.size() == 1) suggestList.add("No suggestions");
 		return suggestList;
+	}
+
+	/**
+	 * Saves the dictionary of word in its current form or lowercase
+	 * @param asLower True to make all words lowercase, False for original casing
+	 */
+	private void saveLexcion(boolean asLower) {
+		try {
+			FileReader file = new FileReader("data/en-US.dic");
+			BufferedReader buffer = new BufferedReader(file);
+			for (String line; (line = buffer.readLine()) != null; ) {
+				if (asLower) {
+					line = line.toLowerCase();
+				}
+				lexicon.add(line);
+			}
+			buffer.close();
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
 	}
 
 	/**
