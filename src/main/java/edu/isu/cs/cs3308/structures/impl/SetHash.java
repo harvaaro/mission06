@@ -2,6 +2,7 @@ package edu.isu.cs.cs3308.structures.impl;
 
 import edu.isu.cs.cs3308.structures.Set;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -9,7 +10,11 @@ import java.util.Iterator;
  *
  * @author Aaron Harvey
  */
-public class HashMap<T> implements Set<T> {
+public class SetHash<T> implements Set<T> {
+
+	private int size = 13;
+	private ArrayList<T>[] buckets;
+
 	/**
 	 * Add element e to the set, unless e already exists in the set or e is null.
 	 *
