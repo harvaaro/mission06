@@ -2,9 +2,6 @@ package edu.isu.cs.cs3308.structures.impl;
 
 import edu.isu.cs.cs3308.SpellChecker;
 
-// testing built in hashset for now.
-import java.util.HashSet;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -18,9 +15,8 @@ import java.util.List;
  */
 public class Spelling implements SpellChecker {
 
-	// testing built in hashset for now.
 	private List<String> suggestList = new ArrayList<>();
-	private HashSet<String> lexicon = new HashSet<>();
+	private SetHash<String> lexicon = new SetHash<>();
 	private char[] changes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'".toCharArray();
 
 	public Spelling() {
@@ -46,6 +42,7 @@ public class Spelling implements SpellChecker {
 		if (suggestList.size() == 1) {
 			suggestList = new ArrayList<>();
 			saveLexcion(true);
+			s = s.toLowerCase();
 			processWord(s);
 		}
 		removeDuplicates();
@@ -87,6 +84,12 @@ public class Spelling implements SpellChecker {
 		}
 	}
 
+	private void compareToLexicon(String word) {
+		if (lexicon.contains(word)) {
+			suggestList.add(word);
+		}
+	}
+
 	/**
 	 * Process the word in four ways by checking:
 	 * Swapping adjacent characters
@@ -98,32 +101,25 @@ public class Spelling implements SpellChecker {
 	 * @param word The word to check against the lexicon
 	 */
 	private void processWord(String word) {
-		for (int check = 1; check < 5; check++) {
-			for (int i = 0; i < word.length() - 1; i++) {
-				StringBuilder verify = new StringBuilder(word);
+		for (int i = 0; i < word.length() - 1; i++) {
+			StringBuilder verify = new StringBuilder(word);
 
-				if (check <= 2) {
-					if (check == 1) {
-						verify.insert(i, word.charAt(i + 1));
-						verify.deleteCharAt(i + 2);
-					} else {
-						verify.deleteCharAt(i);
-					}
-				} else {
-					for (char c : changes) {
-						verify = new StringBuilder(word);
+			verify.insert(i, word.charAt(i + 1));
+			verify.deleteCharAt(i + 2);
+			compareToLexicon(verify.toString());
 
-						if (check == 3) {
-							verify.insert(i, c);
-						} else {
-							verify.setCharAt(i, c);
-						}
-					}
-				}
+			verify = new StringBuilder(word);
+			verify.deleteCharAt(i);
+			compareToLexicon(verify.toString());
 
-				if (lexicon.contains(verify.toString())) {
-					suggestList.add(verify.toString());
-				}
+			for (char c : changes) {
+				verify = new StringBuilder(word);
+				verify.insert(i, c);
+				compareToLexicon(verify.toString());
+
+				verify = new StringBuilder(word);
+				verify.setCharAt(i, c);
+				compareToLexicon(verify.toString());
 			}
 		}
 	}

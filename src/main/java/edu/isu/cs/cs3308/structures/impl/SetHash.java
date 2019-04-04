@@ -12,8 +12,26 @@ import java.util.Iterator;
  */
 public class SetHash<T> implements Set<T> {
 
-	private int size = 13;
+	private int size = 0;
+	private int prime = 6661;
 	private ArrayList<T>[] buckets;
+
+	public SetHash() {
+		buckets = new ArrayList[prime];
+		for (int i = 0; i < buckets.length; i++) {
+			buckets[i] = new ArrayList<>();
+		}
+	}
+
+	/**
+	 * Method to hash the data
+	 *
+	 * @param e value to hash
+	 * @return hashed value based on the prime
+	 */
+	private int hash(T e) {
+		return (e.hashCode() & 0x7fffffff) % prime;
+	}
 
 	/**
 	 * Add element e to the set, unless e already exists in the set or e is null.
@@ -22,7 +40,13 @@ public class SetHash<T> implements Set<T> {
 	 */
 	@Override
 	public void add(T e) {
-
+		if (e != null) {
+			ArrayList<T> bucket = buckets[hash(e)];
+			if (!contains(e)) {
+				bucket.add(e);
+				size++;
+			}
+		}
 	}
 
 	/**
@@ -32,7 +56,13 @@ public class SetHash<T> implements Set<T> {
 	 */
 	@Override
 	public void remove(T e) {
-
+		if (e != null) {
+			ArrayList<T> bucket = buckets[hash(e)];
+			if (!contains(e)) {
+				bucket.remove(e);
+				size--;
+			}
+		}
 	}
 
 	/**
@@ -43,6 +73,9 @@ public class SetHash<T> implements Set<T> {
 	 */
 	@Override
 	public boolean contains(T e) {
+		if (e != null && buckets[hash(e)].contains(e)) {
+			return true;
+		}
 		return false;
 	}
 
@@ -53,7 +86,11 @@ public class SetHash<T> implements Set<T> {
 	 */
 	@Override
 	public Iterator<T> iterator() {
-		return null;
+		ArrayList<T> temp = new ArrayList<T>();
+		for (int i = 0; i < size; i++) {
+			temp.addAll(buckets[i]);
+		}
+		return temp.iterator();
 	}
 
 	/**
@@ -63,7 +100,7 @@ public class SetHash<T> implements Set<T> {
 	 */
 	@Override
 	public boolean isEmpty() {
-		return false;
+		return size != 0;
 	}
 
 	/**
@@ -74,9 +111,13 @@ public class SetHash<T> implements Set<T> {
 	 */
 	@Override
 	public void addAll(Set<T> s) {
-//		for (T item : s) {
-//			add(item);
-//		}
+		for (Iterator<T> it = s.iterator(); it.hasNext(); ) {
+			T e = it.next();
+			if (!contains(e)) {
+				add(e);
+				size++;
+			}
+		}
 	}
 
 	/**
@@ -87,7 +128,13 @@ public class SetHash<T> implements Set<T> {
 	 */
 	@Override
 	public void retainAll(Set<T> s) {
-
+		for (Iterator<T> it = this.iterator(); it.hasNext();) {
+			T e = it.next();
+			if (!contains(e)) {
+				remove(e);
+				size--;
+			}
+		}
 	}
 
 	/**
@@ -98,6 +145,12 @@ public class SetHash<T> implements Set<T> {
 	 */
 	@Override
 	public void removeAll(Set<T> s) {
-
+		for (Iterator<T> it = this.iterator(); it.hasNext();) {
+			T e = it.next();
+			if (contains(e)) {
+				remove(e);
+				size--;
+			}
+		}
 	}
 }
