@@ -17,10 +17,12 @@ public class Spelling implements SpellChecker {
 
 	private List<String> suggestList = new ArrayList<>();
 	private SetHash<String> lexicon = new SetHash<>();
-	private char[] changes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'".toCharArray();
+//	private char[] changes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'".toCharArray();
+	private char[] changes = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
+		'p','q','r','s','t','u','v','w','x','y','z',0x0027};
 
 	public Spelling() {
-		saveLexcion(false);
+		saveLexcion(true);
 	}
 
 	/**
@@ -33,18 +35,19 @@ public class Spelling implements SpellChecker {
 	 */
 	@Override
 	public List<String> check(String s) {
+		s = s.toLowerCase();
 		suggestList.clear();
 		suggestList.add(s);
 
 		if (lexicon.contains(s)) return suggestList;
 
 		processWord(s);
-		if (suggestList.size() == 1) {
-			suggestList = new ArrayList<>();
-			saveLexcion(true);
-			s = s.toLowerCase();
-			processWord(s);
-		}
+//		if (suggestList.size() == 1) {
+//			suggestList = new ArrayList<>();
+//			saveLexcion(true);
+//			s = s.toLowerCase();
+//			processWord(s);
+//		}
 		removeDuplicates();
 
 		if (suggestList.size() == 1) suggestList.add("No suggestions");
@@ -53,6 +56,7 @@ public class Spelling implements SpellChecker {
 
 	/**
 	 * Saves the dictionary of word in its current form or lowercase
+	 *
 	 * @param asLower True to make all words lowercase, False for original casing
 	 */
 	private void saveLexcion(boolean asLower) {
@@ -84,6 +88,11 @@ public class Spelling implements SpellChecker {
 		}
 	}
 
+	/**
+	 * See if the lexicon has the word
+	 *
+	 * @param word the word to search for
+	 */
 	private void compareToLexicon(String word) {
 		if (lexicon.contains(word)) {
 			suggestList.add(word);
